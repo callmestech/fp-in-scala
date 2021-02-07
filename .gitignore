@@ -1,0 +1,50 @@
+### Scala template
+*.class
+*.log
+logs
+snapshots
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+### Java template
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+### JetBrains template
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion
+
+*.iml
+
+## Directory-based project format:
+.idea
+
+# IntelliJ
+/out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules
+
+### OSX template
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*

@@ -3,15 +3,13 @@ package com.callmestech.exercises
 import org.scalatest.propspec.AnyPropSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import Chapter3._
+import com.callmestech.exercises.Chapter3.List.{lengthViaFoldL, productViaFoldL, sumViaFoldL}
 import org.scalatest.matchers.should.Matchers
 import org.scalacheck.Gen
 
 class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 
-  val PosSeqGen = Gen.containerOf[Seq, Int](Gen.posNum[Int])
-  val ListGen: Gen[List[Int]] = for {
-    xs <- Gen.containerOf[Seq, Int](Gen.posNum[Int])
-  } yield List(xs:_*)
+  private val PosSeqGen = Gen.containerOf[Seq, Int](Gen.posNum[Int])
 
   property(":: should add elem to the front of list") {
     forAll { (i: Int) =>
@@ -43,6 +41,33 @@ class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
 
       if (list.isEmpty) assertThrows[UnsupportedOperationException](list.reduce(_ + _))
       else list.reduce(_ + _) shouldEqual xs.sum
+    }
+  }
+
+  property("foldR should correctly calculate sum / product of list") {
+    forAll(PosSeqGen) { (xs: Seq[Int]) =>
+      val list = List(xs:_*)
+
+      list.foldR(0)(_ + _) shouldEqual xs.sum
+      list.foldR(1)(_ * _) shouldEqual xs.product
+    }
+  }
+
+  property("length should correctly calculate length of the list") {
+    forAll(PosSeqGen) { (xs: Seq[Int]) =>
+      val list = List(xs:_*)
+
+      list.length shouldEqual xs.length
+    }
+  }
+
+  property("exercise 3.11") {
+    forAll(PosSeqGen) { (xs: Seq[Int]) =>
+      val list = List(xs:_*)
+
+      lengthViaFoldL(list) shouldEqual xs.length
+      sumViaFoldL(list) shouldEqual xs.sum
+      productViaFoldL(list) shouldEqual xs.product
     }
   }
 }

@@ -22,14 +22,21 @@ object Chapter3 {
       loop(this, Nil)
     }
 
+    /** Exercise 3.10
+     * */
     def foldL[B](z: B)(f: (B, A) => B): B = {
       @tailrec
-      def loop(z: B)(f: (B, A) => B, rem: List[A]): B = rem match {
+      def loop(rem: List[A], z: B)(f: (B, A) => B): B = rem match {
         case Nil => z
-        case Cons(h, t) => loop(f(z, h))(f, t)
+        case Cons(h, t) => loop(t, f(z, h))(f)
       }
 
-      loop(z)(f, this)
+      loop(this, z)(f)
+    }
+
+    def foldR[B](z: B)(f: (A, B) => B): B = this match {
+      case Nil => z
+      case Cons(h, t) => f(h, t.foldR(z)(f))
     }
 
     def reduce[B >: A](f: (B, B) => B): B = this match {
@@ -103,6 +110,12 @@ object Chapter3 {
 
       loop(this, Nil).reverse
     }
+
+    /**Exercise 3.9
+     *
+     * Compute the length of a list using foldRight.
+     * */
+    def length: Int = foldR(0)((_, acc) => acc + 1)
   }
 
   final case object Nil extends List[Nothing]
@@ -118,6 +131,37 @@ object Chapter3 {
       case Nil => 0
       case Cons(h, t) => h + sum(t)
     }
+
+    /** Exercise 3.7
+     *
+     * Can product, implemented using foldRight, immediately halt the recursion and return 0.0 if it encounters a 0.0?
+     * Why or why not? Consider how any short-circuiting might work if you call foldRight with a large list.
+     * This is a deeper question that we’ll return to in chapter 5.*/
+    def productViaFoldR(as: List[Int]): Int =
+      as.foldR(1)((a, acc) => if (a == 0) return 0 else a * acc) // seems that isn't possible
+
+    /**Exercise 3.8
+     *
+     * See what happens when you pass Nil and Cons themselves to foldRight,
+     * like this: foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_)).
+     * What do you think this says about the relationship between foldRight and the data constructors of List?
+     * */
+//      [1, 2, 3].foldR(Nil: List[Int])(Cons(_, _))
+//      Cons(1, [2, 3].foldR(Nil)(f))
+//      Cons(1, Cons(2, [3].foldR(Nil)(f)))
+//      Cons(1, Cons(2, Cons(3, Nil.foldR(Nil)(f))))
+    def foo(as: List[Int]) =
+      as.foldR(Nil: List[Int])(Cons(_, _))
+
+    /** Exercise 3.11
+     *
+     * Write sum, product, and a function to compute the length of a list using foldLeft
+     * */
+    def sumViaFoldL(xs: List[Int]): Int = xs.foldL(0)(_ + _)
+
+    def productViaFoldL(xs: List[Int]): Int = xs.foldL(1)(_ * _)
+
+    def lengthViaFoldL(xs: List[Int]): Int = xs.foldL(0)((acc, _) => acc + 1)
   }
 
   //  What will be the result of the following match expression? /

@@ -12,17 +12,8 @@ object Chapter3 {
 
     def isEmpty: Boolean = this == Nil
 
-    def reverse: List[A] = {
-      @tailrec
-      def loop(as: List[A], acc: List[A]): List[A] = as match {
-        case Nil => acc
-        case Cons(h, t) => loop(t, h :: acc)
-      }
-
-      loop(this, Nil)
-    }
-
     /** Exercise 3.10
+     *
      * */
     def foldL[B](z: B)(f: (B, A) => B): B = {
       @tailrec
@@ -33,6 +24,37 @@ object Chapter3 {
 
       loop(this, z)(f)
     }
+
+    /** Exercise 3.12
+     *
+     * Write a function that returns the reverse of a list (given List(1,2,3) it returns List(3,2,1)).
+     * See if you can write it using a fold.
+     * */
+    def reverse: List[A] =
+      foldL(Nil: List[A])((acc, a) => Cons(a, acc))
+
+    def reverseViaFoldR: List[A] =
+      foldR(Nil: List[A])((a, acc) => Cons(a, acc))
+
+    /** Exercise 3.13
+     *
+     * Hard: Can you write foldLeft in terms of foldRight?
+     * How about the other way around?
+     * Implementing foldRight via foldLeft is useful because it lets us implement foldRight tail-recursively,
+     * which means it works even for large lists without overflow- ing the stack.
+     * */
+    def foldRViaFoldL[B](z: B)(f: (A, B) => B): B =
+      this.reverse.foldL(z)((b, a) => f(a, b))
+
+    def foldRViaFoldL2[B](z: B)(f: (A, B) => B): B =
+      this.reverse.foldL((b: B) => b)((g, a) => b => g(f(a, b)))(z)
+
+    /** Exercise 3.14
+     *
+     * Implement append in terms of either foldLeft or foldRight.
+     * */
+    def ++[A1 >: A](a1s: List[A1]): List[A1] =
+      foldR(a1s)(Cons(_, _))
 
     def foldR[B](z: B)(f: (A, B) => B): B = this match {
       case Nil => z
@@ -97,25 +119,45 @@ object Chapter3 {
      * that returns a List consisting of all but the last element of a List. So, given List(1,2,3,4),
      * init will return List(1,2,3).
      * Why can’t this function be implemented in constant time like tail?
-     *
-     * My implementation has O(N^2^) complexity. It's horrible. How could I do better?
      * */
     def init: List[A] = {
-      @tailrec
-      def loop(as: List[A], acc: List[A]): List[A] = as match {
-        case Nil => acc
-        case Cons(_, Nil) => acc
-        case Cons(h, t) => loop(t, Cons(h, acc))
+      def loop(as: List[A]): List[A] = as match {
+        case Nil => sys.error("init on empty list")
+        case Cons(_, Nil) => Nil
+        case Cons(h, t) => Cons(h, loop(t))
       }
 
+      loop(this)
+    }
+
+    def init2: List[A] = {
+      @tailrec
+      def loop(as: List[A], acc: List[A]): List[A] = as match {
+        case Nil          => sys.error("init on empty list")
+        case Cons(_, Nil) => acc
+        case Cons(h, t)   => loop(t, Cons(h, acc))
+      }
       loop(this, Nil).reverse
     }
 
-    /**Exercise 3.9
+    /** Exercise 3.9
      *
      * Compute the length of a list using foldRight.
      * */
     def length: Int = foldR(0)((_, acc) => acc + 1)
+
+    override def toString: String = {
+      val str: String = s"List("
+      //todo : now it works incorrectly
+      @tailrec
+      def loop(xs: List[A], acc: String): String = xs match {
+        case Nil => s"$acc)"
+        case Cons(h, Nil) => s"$acc$h)"
+        case Cons(h, t) => loop(t, s"$h, ")
+      }
+
+      s"$str${loop(this, "")}"
+    }
   }
 
   final case object Nil extends List[Nothing]
@@ -136,20 +178,20 @@ object Chapter3 {
      *
      * Can product, implemented using foldRight, immediately halt the recursion and return 0.0 if it encounters a 0.0?
      * Why or why not? Consider how any short-circuiting might work if you call foldRight with a large list.
-     * This is a deeper question that we’ll return to in chapter 5.*/
+     * This is a deeper question that we’ll return to in chapter 5. */
     def productViaFoldR(as: List[Int]): Int =
       as.foldR(1)((a, acc) => if (a == 0) return 0 else a * acc) // seems that isn't possible
 
-    /**Exercise 3.8
+    /** Exercise 3.8
      *
      * See what happens when you pass Nil and Cons themselves to foldRight,
      * like this: foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_)).
      * What do you think this says about the relationship between foldRight and the data constructors of List?
      * */
-//      [1, 2, 3].foldR(Nil: List[Int])(Cons(_, _))
-//      Cons(1, [2, 3].foldR(Nil)(f))
-//      Cons(1, Cons(2, [3].foldR(Nil)(f)))
-//      Cons(1, Cons(2, Cons(3, Nil.foldR(Nil)(f))))
+    //      [1, 2, 3].foldR(Nil: List[Int])(Cons(_, _))
+    //      Cons(1, [2, 3].foldR(Nil)(f))
+    //      Cons(1, Cons(2, [3].foldR(Nil)(f)))
+    //      Cons(1, Cons(2, Cons(3, Nil.foldR(Nil)(f))))
     def foo(as: List[Int]) =
       as.foldR(Nil: List[Int])(Cons(_, _))
 

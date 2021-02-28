@@ -1,8 +1,7 @@
 package com.callmestech.exercises
 
-import com.callmestech.exercises.Chapter3.List.sum
-
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 object Chapter3 {
 
@@ -133,10 +132,11 @@ object Chapter3 {
     def init2: List[A] = {
       @tailrec
       def loop(as: List[A], acc: List[A]): List[A] = as match {
-        case Nil          => sys.error("init on empty list")
+        case Nil => sys.error("init on empty list")
         case Cons(_, Nil) => acc
-        case Cons(h, t)   => loop(t, Cons(h, acc))
+        case Cons(h, t) => loop(t, Cons(h, acc))
       }
+
       loop(this, Nil).reverse
     }
 
@@ -148,6 +148,7 @@ object Chapter3 {
 
     override def toString: String = {
       val str: String = s"List("
+
       //todo : now it works incorrectly
       @tailrec
       def loop(xs: List[A], acc: String): String = xs match {
@@ -158,6 +159,34 @@ object Chapter3 {
 
       s"$str${loop(this, "")}"
     }
+
+    /** Exercise 3.18
+     *
+     * Write a function map that generalizes modifying each element in a list
+     * while maintaining the structure of the list.
+     * */
+    def map[B](f: A => B): List[B] =
+      foldRViaFoldL(Nil: List[B])((a, bs) => Cons(f(a), bs))
+
+    /** Exercise 3.19
+     *
+     * Write a function filter that removes elements from a list unless they satisfy a given predicate.
+     * Use it to remove all odd numbers from a List[Int].
+     * */
+    def filter(p: A => Boolean): List[A] = {
+      val buffer = new ListBuffer[A]
+
+      @tailrec
+      def go(xs: List[A], buffer: ListBuffer[A], p: A => Boolean): List[A] = xs match {
+        case Nil => List(buffer.toList: _*)
+        case Cons(h, t) => if (p(h)) go(t, buffer += h, p) else go(t, buffer, p)
+      }
+
+      go(this, buffer, p)
+    }
+
+    def filter2(p: A => Boolean): List[A] =
+      foldRViaFoldL(Nil: List[A])((a, as) => if (p(a)) Cons(a, as) else as)
   }
 
   final case object Nil extends List[Nothing]
@@ -204,14 +233,26 @@ object Chapter3 {
     def productViaFoldL(xs: List[Int]): Int = xs.foldL(1)(_ * _)
 
     def lengthViaFoldL(xs: List[Int]): Int = xs.foldL(0)((acc, _) => acc + 1)
-  }
 
-  //  What will be the result of the following match expression? /
-  val x = List(1, 2, 3, 4, 5) match {
-    case Cons(x, Cons(2, Cons(4, _))) => x
-    case Nil => 42
-    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
-    case Cons(h, t) => h + sum(t)
-    case _ => 101
+    /** Exercise 3.15
+     *
+     * Hard: Write a function that concatenates a list of lists into a single list.
+     * Its runtime should be linear in the total length of all lists.
+     * Try to use functions we have already defined.
+     * */
+    def flatten[A](ass: List[List[A]]): List[A] =
+      ass.foldL(Nil: List[A])(_ ++ _)
+
+
+    /** Exercise 3.16
+     *
+     * Write a function that transforms a list of integers by adding 1 to each element.
+     * (Reminder: this should be a pure function that returns a new List!)
+     * */
+    def addOne(xs: List[Int]): List[Int] =
+      xs.foldR(Nil: List[Int])((a , acc) => Cons(a + 1, acc))
+
+    def doubles2Strings(xs: List[Double]): List[String] =
+      xs.foldRViaFoldL(Nil: List[String])((a, acc) => Cons(a.toString, acc))
   }
 }

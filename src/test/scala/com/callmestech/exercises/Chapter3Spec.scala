@@ -10,6 +10,7 @@ import org.scalacheck.Gen
 class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 
   private val PosSeqGen = Gen.containerOf[Seq, Int](Gen.posNum[Int])
+  private val PosSeqGenN = Gen.containerOfN[Seq, Int](3, Gen.posNum[Int])
   private val DoubleSeqGen = Gen.containerOf[Seq, Double](Gen.double)
   private val NonEmptyPosSeqGen = Gen.nonEmptyContainerOf[Seq, Int](Gen.posNum[Int])
 
@@ -124,6 +125,25 @@ class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
 
       list.filter(_ > 2) shouldEqual List(xs.filter(_ > 2): _*)
       list.filter2(_ > 2) shouldEqual List(xs.filter(_ > 2): _*)
+    }
+  }
+
+  property("flatMap should concatenate lists into on list") {
+    forAll(PosSeqGen) { xs =>
+      val list = List(xs: _*)
+
+      list.flatMap(i => List(i, i)) shouldEqual List(xs.flatMap(i => Seq(i, i)): _*)
+    }
+  }
+
+  property("combine elems of lists") {
+    forAll(PosSeqGen, PosSeqGen) { (xs, ys) =>
+      val list1 = List(xs: _*)
+      val list2 = List(ys: _*)
+
+      println(list1)
+      println(list2)
+      println(List.combineElemsOfLists(list1, list2))
     }
   }
 }

@@ -146,20 +146,6 @@ object Chapter3 {
      * */
     def length: Int = foldR(0)((_, acc) => acc + 1)
 
-    override def toString: String = {
-      val str: String = s"List("
-
-      //todo : now it works incorrectly
-      @tailrec
-      def loop(xs: List[A], acc: String): String = xs match {
-        case Nil => s"$acc)"
-        case Cons(h, Nil) => s"$acc$h)"
-        case Cons(h, t) => loop(t, s"$h, ")
-      }
-
-      s"$str${loop(this, "")}"
-    }
-
     /** Exercise 3.18
      *
      * Write a function map that generalizes modifying each element in a list
@@ -187,6 +173,52 @@ object Chapter3 {
 
     def filter2(p: A => Boolean): List[A] =
       foldRViaFoldL(Nil: List[A])((a, as) => if (p(a)) Cons(a, as) else as)
+
+    /** Exercise 3.20
+     *
+     * Write a function flatMap that works like map
+     * except that the function given will return a list instead of a single result,
+     * and that list should be inserted into the final resulting list. Here is its signature:
+     * def flatMap[A,B](as: List[A])(f: A => List[B]): List[B]
+     * For instance, flatMap(List(1,2,3))(i => List(i,i)) should result in List(1,1,2,2,3,3).
+     * */
+
+    def flatMap[B](f: A => List[B]): List[B] =
+      foldR(Nil: List[B])((a, bs) => f(a) ++ bs)
+
+    def flatMap2[B](f: A => List[B]): List[B] =
+      List.flatten(map(f))
+
+    /** Exercise 3.21
+     *
+     * Use flatMap to implement filter.
+     * */
+    def filterViaFlatmap(p: A => Boolean): List[A] =
+      flatMap(a => if (p(a)) List(a) else Nil)
+
+    def zipWith[B, C](other: List[B])(combine: (A, B) => C): List[C] = (this, other) match {
+      case (Nil, _) | (_, Nil) => Nil
+      case (Cons(x, xs), Cons(y, ys)) => Cons(combine(x, y), xs.zipWith(ys)(combine))
+    }
+
+    /** Exercise 3.24
+     *
+     * Hard: As an example, implement hasSubsequence for checking whether a List contains another List as a subsequence.
+     * For instance, List(1,2,3,4) would have List(1,2), List(2,3), and List(4) as subsequences, among others.
+     * You may have some difficulty finding a concise purely functional implementation that is also efficient.
+     * That’s okay. Implement the function however comes most naturally.
+     * We’ll return to this implementation in chapter 5 and hopefully improve on it.
+     * Note: Any two values x and y can be compared for equality in Scala using the expression x == y.
+     * */
+//    def hasSubsequence(sub: List[A]): Boolean = {
+//      def go(sup: List[A], sub: List[A], flag: Boolean): Boolean = {
+//        (this, sub) match {
+//          case (Nil, _) => false
+//          case (_, Nil) => flag
+//          case (Cons(x, xs), Cons(y, ys)) => if (x == y) go(xs, ys, true) else
+//        }
+//      }
+//    }
   }
 
   final case object Nil extends List[Nothing]
@@ -254,5 +286,17 @@ object Chapter3 {
 
     def doubles2Strings(xs: List[Double]): List[String] =
       xs.foldRViaFoldL(Nil: List[String])((a, acc) => Cons(a.toString, acc))
+
+    /** Exercise 3.22
+     *
+     * Write a function that accepts two lists and constructs a new list by adding corresponding elements.
+     * For example, List(1,2,3) and List(4,5,6) become List(5,7,9).
+     * */
+
+    def combineElemsOfLists(as: List[Int], bs: List[Int]): List[Int] = (as, bs) match {
+      case (_, Nil) => as
+      case (Nil, _) => bs
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, combineElemsOfLists(t1, t2))
+    }
   }
 }

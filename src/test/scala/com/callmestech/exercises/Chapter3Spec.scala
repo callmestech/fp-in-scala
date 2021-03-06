@@ -2,10 +2,10 @@ package com.callmestech.exercises
 
 import org.scalatest.propspec.AnyPropSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import Chapter3._
-import com.callmestech.exercises.Chapter3.List.{addOne, doubles2Strings, lengthViaFoldL, productViaFoldL, sumViaFoldL}
 import org.scalatest.matchers.should.Matchers
 import org.scalacheck.Gen
+import chapter3.List._
+import chapter3.List
 
 class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 

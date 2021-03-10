@@ -1,11 +1,10 @@
-package com.callmestech.exercises
+package com.callmestech.exercises.chapter3
 
+import org.scalacheck.Gen
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.propspec.AnyPropSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalatest.matchers.should.Matchers
-import org.scalacheck.Gen
-import chapter3.List._
-import chapter3.List
+import com.callmestech.exercises.chapter3.List._
 
 class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 

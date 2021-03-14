@@ -84,7 +84,6 @@ object MyOption {
   /** Exercise 4.3
    *
    * */
-
   def map2[A, B, C](a: MyOption[A], b: MyOption[B])
                    (f: (A, B) => C): MyOption[C] =
     a.flatMap(aa => b.map(bb => f(aa, bb)))
@@ -114,4 +113,31 @@ object MyOption {
 
   def sequenceViaMap2[A](xs: List[MyOption[A]]): MyOption[List[A]] =
     xs.foldRight(Some(Nil): MyOption[List[A]])((acc, a) => acc.map2(a)(_ :: _))
+
+  def sequenceViaTraverse[A](xs: List[MyOption[A]]): MyOption[List[A]] =
+    traverse(xs)(identity)
+
+  /** Exercise 4.5
+   *
+   * */
+  def traverse[A, B](as: List[A])
+                    (f: A => MyOption[B]): MyOption[List[B]] = {
+    @tailrec
+    def go(xs: List[A], acc: MyOption[List[B]]): MyOption[List[B]] = xs match {
+      case Nil => acc
+      case ::(head, next) => go(next, acc.flatMap(xxs => f(head).map(_ :: xxs)))
+    }
+
+    go(as, Some(Nil))
+  }
+
+  def traverseViaFoldR[A, B](as: List[A])
+                            (f: A => MyOption[B]): MyOption[List[B]] =
+    as.foldRight(Some(Nil): MyOption[List[B]])((a, acc) => map2(f(a), acc)(_ :: _))
+
+  def traverse_2[A, B](as: List[A])
+                      (f: A => MyOption[B]): MyOption[List[B]] = as match {
+    case Nil => Some(Nil)
+    case ::(head, next) => map2(f(head), traverse_2(next)(f))(_ :: _)
+  }
 }

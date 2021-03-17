@@ -51,7 +51,7 @@ object Or {
    *  {{{def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]]}}}
    * */
   def sequence[E, A](es: List[Or[E, A]]): E Or List[A] =
-    es.foldRight(Right(List.empty[A]): Or[E, List[A]])((a, acc) => a.map2(acc)(_ :: _))
+    traverse(es)(identity)
 
   def traverse[E, A, B](as: List[A])
                        (f: A => Or[E, B]): Or[E, List[B]] =

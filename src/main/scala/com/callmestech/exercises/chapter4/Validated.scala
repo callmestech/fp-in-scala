@@ -21,9 +21,9 @@ sealed trait Validated[+E, +A] {
     }
   }
 
-  def flatMap[B](f: A => Validated[E, B]): Validated[E, B] = this match {
+  def flatMap[B, E1 >: E](f: A => Validated[E1, B]): Validated[E1, B] = this match {
     case i @ Invalid(_) => i
-    case Valid(v) => f(v)
+    case Valid(v)       => f(v)
   }
 }
 

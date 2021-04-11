@@ -1,11 +1,9 @@
 package com.callmestech.exercises.chapter5
 
+import com.callmestech.exercises.BaseSpec
 import org.scalacheck.Gen
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.propspec.AnyPropSpec
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class StreamSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
+class StreamSpec extends BaseSpec {
 
   val ListGen: Gen[List[Int]] = Gen.listOfN[Int](10, Gen.chooseNum(-100, 200))
 

@@ -1,12 +1,10 @@
 package com.callmestech.exercises.chapter3
 
-import org.scalacheck.Gen
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.propspec.AnyPropSpec
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import com.callmestech.exercises.BaseSpec
 import com.callmestech.exercises.chapter3.List._
+import org.scalacheck.Gen
 
-class Chapter3Spec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
+class Chapter3Spec extends BaseSpec {
 
   private val PosSeqGen = Gen.containerOf[Seq, Int](Gen.posNum[Int])
   private val PosSeqGenN = Gen.containerOfN[Seq, Int](3, Gen.posNum[Int])

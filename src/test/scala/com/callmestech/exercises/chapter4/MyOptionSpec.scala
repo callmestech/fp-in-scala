@@ -1,12 +1,10 @@
 package com.callmestech.exercises.chapter4
 
-import org.scalacheck.Gen
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.propspec.AnyPropSpec
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import com.callmestech.exercises.BaseSpec
 import com.callmestech.exercises.chapter4.MyOption._
+import org.scalacheck.Gen
 
-class MyOptionSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
+class MyOptionSpec extends BaseSpec {
 
   private val MyOptionGen: Gen[MyOption[Int]] =
     for {

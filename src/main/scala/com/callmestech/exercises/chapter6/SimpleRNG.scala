@@ -1,5 +1,7 @@
 package com.callmestech.exercises.chapter6
 
+import scala.annotation.tailrec
+
 trait RNG {
   def nextInt: (Int, RNG)
 }
@@ -14,6 +16,7 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object SimpleRNG {
+  type Rand[+A] = RNG => (A, RNG)
 
   /** Exercise 6.1
    *
@@ -73,6 +76,7 @@ object SimpleRNG {
    * */
    def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
 
+     @tailrec
      def go(i: Int, acc: (List[Int], RNG)): (List[Int], RNG) = {
        if (i > 0) {
          val (i1, r) = acc._2.nextInt
@@ -81,4 +85,21 @@ object SimpleRNG {
      }
      go(count, (List.empty, rng))
    }
+
+  val int: Rand[Int] = _.nextInt
+
+  def unit[A](a: A): Rand[A] = rng => (a, rng)
+
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
+    val (a, rng2) = s(rng)
+    (f(a), rng2)
+  }
+
+  def nonNegativeEven: Rand[Int] = map(nonNegativeInt)(i => i - i % 2)
+
+  /** Exercise 6.5
+   *
+   * Use map to reimplement double in a more elegant way. See exercise 6.2.
+   * */
+  def double2: Rand[Double] = map(nonNegativeInt)(_ / (Int.MaxValue.toDouble + 1))
 }

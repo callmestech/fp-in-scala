@@ -1,6 +1,7 @@
 package com.callmestech.exercises.chapter6
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ArrayBuffer
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -102,4 +103,69 @@ object SimpleRNG {
    * Use map to reimplement double in a more elegant way. See exercise 6.2.
    * */
   def double2: Rand[Double] = map(nonNegativeInt)(_ / (Int.MaxValue.toDouble + 1))
+
+  /** Exercise 6.6
+   *
+   * Write the implementation of map2 based on the following signature.
+   * This function takes two actions, ra and rb, and a function f for combining their results,
+   * and returns a new action that combines them:
+   * {{{def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C]}}}
+   * */
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = rng => {
+    val (a, rng1) = ra(rng)
+    val (b, rng2) = rb(rng1)
+    (f(a, b), rng2)
+  }
+
+  def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)(_ -> _)
+
+  /** Exercise 6.7
+   *
+   * Hard: If you can combine two RNG transitions, you should be able to combine a whole list of them.
+   * Implement sequence for combining a List of transitions into a single transition.
+   * Use it to reimplement the ints function you wrote before. For the latter,
+   * you can use the standard library function {{{List.fill(n)(x)}}} to make a list with x repeated n times.
+   * */
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = rng => {
+
+    @tailrec
+    def go(xs: List[Rand[A]], acc: (List[A], RNG)): (List[A], RNG) = xs match {
+      case Nil    => acc
+      case h :: t =>
+        val (a, r) = h(acc._2)
+        go(t, (a :: acc._1, r))
+    }
+
+    go(fs, (List.empty, rng))
+  }
+
+  def sequence2[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(unit(List.empty[A]))((f, acc) => map2(f, acc)(_ :: _))
+
+  /** Exercise 6.8
+   *
+   * Implement flatMap, and then use it to implement nonNegativeLessThan.
+   * */
+  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => {
+    val (a, r) = f(rng)
+    g(a)(r)
+  }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] =
+    flatMap(nonNegativeInt) { i =>
+      val mod = i % n
+      if (i + (n - 1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
+    }
+
+  /** Exercise 6.9
+   *
+   * Reimplement <b>map</b> and <b>map2</b> in terms of <b>flatMap</b>.
+   * The fact that this is possible is what we’re referring to when we say that flatMap is more powerful than map and map2.
+   * */
+  def mapViaFlatMap[A, B](r: Rand[A])(f: A => B): Rand[B] =
+    flatMap(r)(a => unit(f(a)))
+
+  def map2ViaFlatMap[A, B, C](r1: Rand[A], r2: Rand[B])
+                             (f: (A, B) => C): Rand[C] =
+    flatMap(r1)(a => map(r2)(b => f(a, b)))
 }

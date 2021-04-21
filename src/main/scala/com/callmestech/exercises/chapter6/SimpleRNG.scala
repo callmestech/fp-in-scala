@@ -1,7 +1,6 @@
 package com.callmestech.exercises.chapter6
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ArrayBuffer
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -17,7 +16,9 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object SimpleRNG {
-  type Rand[+A] = RNG => (A, RNG)
+  type Rand[+A] = State[RNG, A]
+  type State[S, +A] = S => (A, S)
+
 
   /** Exercise 6.1
    *

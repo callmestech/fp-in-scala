@@ -1,4 +1,4 @@
-package com.callmestech.exercises
+package com.callmestech.exercises.chapter7
 
 import java.util.concurrent.{ExecutorService, Future, TimeUnit}
 import scala.concurrent.TimeoutException

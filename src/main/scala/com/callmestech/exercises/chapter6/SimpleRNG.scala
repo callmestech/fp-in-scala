@@ -15,7 +15,7 @@ case class SimpleRNG(seed: Long) extends RNG {
   }
 }
 
-object SimpleRNG {
+object RNG {
   type Rand[+A] = State[RNG, A]
   type State[S, +A] = S => (A, S)
 
@@ -44,6 +44,11 @@ object SimpleRNG {
 
     (i1 / (Int.MaxValue.toDouble + 1), r1)
   }
+
+  def boolean(rng: RNG): (Boolean, RNG) =
+    rng.nextInt match {
+      case (i, rng2) => (i % 2 == 0, rng2)
+    }
 
   /** Exercise 6.3
    *

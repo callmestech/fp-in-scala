@@ -2,7 +2,7 @@ package com.callmestech.exercises.chapter8
 
 import com.callmestech.exercises.chapter6.{RNG, State}
 
-final case class Gen[A](sample: State[RNG, A]) {
+final case class Gen[+A](sample: State[RNG, A]) {
   /** Exercise 8.6
    *
    * Implement flatMap, and then use it to implement
@@ -12,8 +12,35 @@ final case class Gen[A](sample: State[RNG, A]) {
   def flatMap[B](f: A => Gen[B]): Gen[B] =
     Gen(sample.flatMap(a => f(a).sample))
 
+  def map[B](f: A => B): Gen[B] =
+    Gen(sample.map(f))
+
   def listOfN(size: Gen[Int]): Gen[List[A]] =
     size.flatMap(i => Gen.listOfN(this, i))
+
+  /** Exercise 8.10
+   *
+   * Implement helper functions for converting Gen to SGen.
+   * You can add this as a method on Gen.
+   * */
+  def unsized: SGen[A] = SGen(_ => this)
+}
+
+case class SGen[+A](forSize: Int => Gen[A]) {
+/** Exercise 8.11
+ *
+ * Not surprisingly, SGen at a minimum supports many of the
+ * same operations as Gen, and the implementations are rather mechanical.
+ * Define some convenience functions on SGen that simply
+ * delegate to the corresponding functions on Gen.5
+ * */
+  def apply(n: Int): Gen[A] = forSize(n)
+
+  def map[B](f: A => B): SGen[B] =
+    SGen(forSize(_).map(f))
+
+  def flatMap[B](f: A => SGen[B]): SGen[B] =
+    SGen(n => forSize(n).flatMap(f(_).forSize(n)))
 }
 
 object Gen {

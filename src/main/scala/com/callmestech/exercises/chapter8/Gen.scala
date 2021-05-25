@@ -15,6 +15,10 @@ final case class Gen[+A](sample: State[RNG, A]) {
   def map[B](f: A => B): Gen[B] =
     Gen(sample.map(f))
 
+  def map2[B, C](gb: Gen[B])
+                (f: (A, B) => C): Gen[C] =
+    Gen(sample.map2(gb.sample)(f))
+
   def listOfN(size: Gen[Int]): Gen[List[A]] =
     size.flatMap(i => Gen.listOfN(this, i))
 
@@ -24,6 +28,9 @@ final case class Gen[+A](sample: State[RNG, A]) {
    * You can add this as a method on Gen.
    * */
   def unsized: SGen[A] = SGen(_ => this)
+
+  def **[B](gb: Gen[B]): Gen[(A, B)] =
+    map2(gb)(_ -> _)
 }
 
 case class SGen[+A](forSize: Int => Gen[A]) {
@@ -41,6 +48,9 @@ case class SGen[+A](forSize: Int => Gen[A]) {
 
   def flatMap[B](f: A => SGen[B]): SGen[B] =
     SGen(n => forSize(n).flatMap(f(_).forSize(n)))
+
+  def **[B](gb: SGen[B]): SGen[(A, B)] =
+    SGen(n => apply(n) ** gb(n))
 }
 
 object Gen {
@@ -110,4 +120,21 @@ object Gen {
         )
     )
   }
+
+  /** Exercise 8.12
+   *
+   * Implement a listOf combinator that does not accept an explicit size.
+   * It should return an SGen instead of a Gen.
+   * The implementation should generate lists of the requested size.
+   * */
+  def listOf[A](g: Gen[A]): SGen[List[A]] =
+    SGen(listOfN(g, _))
+
+  /** Exercise 8.13
+   *
+   * Define listOf1 for generating nonempty lists,
+   * and then update your specification of max to use this generator.
+   * */
+  def listOf1[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => listOfN(g, 1.max(n)))
 }

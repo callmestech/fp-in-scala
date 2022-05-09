@@ -14,10 +14,18 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+**/.bloop
+.bsp/
 
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+
+.metals/
+.ammonite/
+metals.sbt
+metals/project/
+.vscode/
 
 ### Java template
 *.class

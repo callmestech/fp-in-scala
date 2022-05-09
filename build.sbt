@@ -2,7 +2,7 @@ name := "fp-in-scala"
 
 version := "0.1"
 
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.8"
 
 val testDependencies = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.1",

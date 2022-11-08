@@ -1,7 +1,7 @@
 import Util._
 
 addCommandAlias(
-  "check",
+  "checkFmt",
   "; scalafmtSbtCheck; scalafmtCheckAll"
 )
 
@@ -10,5 +10,5 @@ onLoadMessage +=
       |╭─────────────────────────────────╮
       |│     List of defined ${styled("aliases")}     │
       |├─────────────┬───────────────────┤
-      |│ ${styled("check")}       │  check format     │
+      |│ ${styled("checkFmt")}    │    check format   │
       |╰─────────────┴───────────────────╯""".stripMargin

@@ -11,8 +11,7 @@ final case class State[S, +A](run: S => (A, S)) {
     f(a).run(s2)
   }
 
-  def map2[B, C](other: State[S, B])
-                (f: (A, B) => C): State[S, C] =
+  def map2[B, C](other: State[S, B])(f: (A, B) => C): State[S, C] =
     flatMap(a => other.map(b => f(a, b)))
 
 }

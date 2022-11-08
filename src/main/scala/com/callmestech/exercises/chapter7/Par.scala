@@ -1,7 +1,12 @@
 package com.callmestech.exercises.chapter7
 
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{Callable, CountDownLatch, ExecutorService, TimeUnit}
+import java.util.concurrent.{
+  Callable,
+  CountDownLatch,
+  ExecutorService,
+  TimeUnit
+}
 import scala.concurrent.TimeoutException
 
 sealed trait Future[A] {
@@ -19,7 +24,7 @@ object Par {
   def lazyUnit[A](a: => A): Par[A] = fork(unit(a))
 
   def run[A](s: ExecutorService)(par: Par[A]): A = {
-    val ref = new AtomicReference[A]
+    val ref   = new AtomicReference[A]
     val latch = new CountDownLatch(1)
     par(s) { a =>
       ref.set(a)
@@ -28,7 +33,6 @@ object Par {
     latch.await()
     ref.get()
   }
-
 
   def fork[A](a: => Par[A]): Par[A] = es => {
     new Future[A] {
@@ -45,8 +49,8 @@ object Par {
   def delay[A](parA: => Par[A]): Par[A] =
     es => parA(es)
 
-  def map2[A, B, C](parA: Par[A], parB: Par[B])
-                   (combine: (A, B) => C): Par[C] = ??? // there should be non-blocking implementation
+  def map2[A, B, C](parA: Par[A], parB: Par[B])(combine: (A, B) => C): Par[C] =
+    ??? // there should be non-blocking implementation
 
   /** Exercise 7.4
     *

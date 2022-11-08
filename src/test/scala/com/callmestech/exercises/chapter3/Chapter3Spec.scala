@@ -6,10 +6,11 @@ import org.scalacheck.Gen
 
 class Chapter3Spec extends BaseSpec {
 
-  private val PosSeqGen = Gen.containerOf[Seq, Int](Gen.posNum[Int])
-  private val PosSeqGenN = Gen.containerOfN[Seq, Int](3, Gen.posNum[Int])
+  private val PosSeqGen    = Gen.containerOf[Seq, Int](Gen.posNum[Int])
+  private val PosSeqGenN   = Gen.containerOfN[Seq, Int](3, Gen.posNum[Int])
   private val DoubleSeqGen = Gen.containerOf[Seq, Double](Gen.double)
-  private val NonEmptyPosSeqGen = Gen.nonEmptyContainerOf[Seq, Int](Gen.posNum[Int])
+  private val NonEmptyPosSeqGen =
+    Gen.nonEmptyContainerOf[Seq, Int](Gen.posNum[Int])
 
   property(":: should add elem to the front of list") {
     forAll { (i: Int) =>
@@ -44,7 +45,6 @@ class Chapter3Spec extends BaseSpec {
     }
   }
 
-
   property("foldL should correctly calculate sum / product of list") {
     forAll(PosSeqGen) { (xs: Seq[Int]) =>
       val list = List(xs: _*)
@@ -58,7 +58,8 @@ class Chapter3Spec extends BaseSpec {
     forAll(PosSeqGen) { xs =>
       val list = List(xs: _*)
 
-      if (list.isEmpty) assertThrows[UnsupportedOperationException](list.reduce(_ + _))
+      if (list.isEmpty)
+        assertThrows[UnsupportedOperationException](list.reduce(_ + _))
       else list.reduce(_ + _) shouldEqual xs.sum
     }
   }
@@ -96,7 +97,7 @@ class Chapter3Spec extends BaseSpec {
       val list2 = List(ys: _*)
 
       val flat = List.flatten(List(list1, list2))
-      flat shouldEqual List(Seq(xs, ys).flatten :_*)
+      flat shouldEqual List(Seq(xs, ys).flatten: _*)
     }
   }
 
@@ -104,7 +105,7 @@ class Chapter3Spec extends BaseSpec {
     forAll(PosSeqGen) { xs =>
       val list = List(xs: _*)
 
-      addOne(list) shouldEqual List(xs.map(_ + 1) :_*)
+      addOne(list) shouldEqual List(xs.map(_ + 1): _*)
     }
   }
 
@@ -112,11 +113,13 @@ class Chapter3Spec extends BaseSpec {
     forAll(DoubleSeqGen) { xs =>
       val list = List(xs: _*)
 
-      doubles2Strings(list) shouldEqual List(xs.map(_.toString) :_*)
+      doubles2Strings(list) shouldEqual List(xs.map(_.toString): _*)
     }
   }
 
-  property("filter should correctly filter out elems that doesn't match to the predicate") {
+  property(
+    "filter should correctly filter out elems that doesn't match to the predicate"
+  ) {
     forAll(PosSeqGen) { xs =>
       val list = List(xs: _*)
 
@@ -129,7 +132,9 @@ class Chapter3Spec extends BaseSpec {
     forAll(PosSeqGen) { xs =>
       val list = List(xs: _*)
 
-      list.flatMap(i => List(i, i)) shouldEqual List(xs.flatMap(i => Seq(i, i)): _*)
+      list.flatMap(i => List(i, i)) shouldEqual List(
+        xs.flatMap(i => Seq(i, i)): _*
+      )
     }
   }
 

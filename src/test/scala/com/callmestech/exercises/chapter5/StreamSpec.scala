@@ -31,7 +31,9 @@ class StreamSpec extends BaseSpec {
     }
   }
 
-  property("takeWhile should return all elems before first elem for which predicate doesn't holds") {
+  property(
+    "takeWhile should return all elems before first elem for which predicate doesn't holds"
+  ) {
     forAll(ListGen) { xs =>
       val stream = Stream(xs: _*)
 

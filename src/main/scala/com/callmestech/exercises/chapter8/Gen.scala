@@ -33,7 +33,7 @@ final case class Gen[+A](sample: State[RNG, A]) {
     map2(gb)(_ -> _)
 }
 
-case class SGen[+A](forSize: Int => Gen[A]) {
+final case class SGen[+A](forSize: Int => Gen[A]) {
 
   /** Exercise 8.11
     *
@@ -66,6 +66,9 @@ object Gen {
     Gen(
       State(RNG.nonNegativeInt).map(i => start + i % (stopExclusive - start))
     )
+
+  def smallInt: Gen[Int] =
+    Gen.choose(-10, 10)
 
   /** Exercise 8.5
     *

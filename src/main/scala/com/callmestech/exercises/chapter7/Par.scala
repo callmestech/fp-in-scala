@@ -1,12 +1,7 @@
 package com.callmestech.exercises.chapter7
 
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{
-  Callable,
-  CountDownLatch,
-  ExecutorService,
-  TimeUnit
-}
+import java.util.concurrent.{Callable, CountDownLatch, ExecutorService, TimeUnit}
 import scala.concurrent.TimeoutException
 
 sealed trait Future[A] {

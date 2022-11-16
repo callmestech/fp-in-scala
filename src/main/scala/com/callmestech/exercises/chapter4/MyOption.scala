@@ -134,9 +134,7 @@ object MyOption {
   def traverseViaFoldR[A, B](
       as: List[A]
   )(f: A => MyOption[B]): MyOption[List[B]] =
-    as.foldRight(Some(Nil): MyOption[List[B]])((a, acc) =>
-      map2(f(a), acc)(_ :: _)
-    )
+    as.foldRight(Some(Nil): MyOption[List[B]])((a, acc) => map2(f(a), acc)(_ :: _))
 
   def traverse_2[A, B](as: List[A])(f: A => MyOption[B]): MyOption[List[B]] =
     as match {

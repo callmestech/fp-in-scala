@@ -4,6 +4,10 @@ addCommandAlias(
   "checkFmt",
   "; scalafmtSbtCheck; scalafmtCheckAll"
 )
+addCommandAlias(
+  "fmt",
+  "; scalafmtSbt; scalafmt"
+)
 
 onLoadMessage +=
   s"""|
@@ -11,4 +15,5 @@ onLoadMessage +=
       |│     List of defined ${styled("aliases")}     │
       |├─────────────┬───────────────────┤
       |│ ${styled("checkFmt")}    │    check format   │
+      |│ ${styled("fmt")}         │          format   │
       |╰─────────────┴───────────────────╯""".stripMargin

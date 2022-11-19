@@ -53,7 +53,5 @@ object Or {
     traverse(es)(identity)
 
   def traverse[E, A, B](as: List[A])(f: A => Or[E, B]): Or[E, List[B]] =
-    as.foldRight(Right(List.empty[B]): Or[E, List[B]])((h, t) =>
-      f(h).map2(t)(_ :: _)
-    )
+    as.foldRight(Right(List.empty[B]): Or[E, List[B]])((h, t) => f(h).map2(t)(_ :: _))
 }

@@ -231,8 +231,7 @@ sealed trait Stream[+A] {
 
 object Stream {
 
-  final case class Cons[A](head: () => A, tail: () => Stream[A])
-      extends Stream[A]
+  final case class Cons[A](head: () => A, tail: () => Stream[A]) extends Stream[A]
 
   final case object Empty extends Stream[Nothing]
 

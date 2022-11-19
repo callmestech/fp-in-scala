@@ -99,9 +99,7 @@ object ParSync {
     * Generalize this function as much as possible.
     */
   def paragraphs(xs: List[String]): ParSync[Int] =
-    xs.foldRight(unit(0))((s, acc) =>
-      map2(lazyUnit(s.count(_ == ' ')), acc)(_ + _)
-    )
+    xs.foldRight(unit(0))((s, acc) => map2(lazyUnit(s.count(_ == ' ')), acc)(_ + _))
 
   def paragraphsViaParFoldMap(xs: List[String]): ParSync[Int] =
     parFoldMap(xs)(0)(_.count(_ == ' '))(_ + _)
@@ -176,12 +174,11 @@ object ParSync {
     *
     * Implement choiceN and then choice in terms of choiceN.
     */
-  def choiceN[A](n: ParSync[Int])(choices: List[ParSync[A]]): ParSync[A] = es =>
-    {
-      val ind = run(es)(n).get
+  def choiceN[A](n: ParSync[Int])(choices: List[ParSync[A]]): ParSync[A] = es => {
+    val ind = run(es)(n).get
 
-      run(es)(choices(ind))
-    }
+    run(es)(choices(ind))
+  }
 
   def choiceViaChoiceN[A](
       cond: ParSync[Boolean]

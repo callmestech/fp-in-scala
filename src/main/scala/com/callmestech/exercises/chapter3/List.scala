@@ -257,9 +257,7 @@ object List {
     * This is a deeper question that we’ll return to in chapter 5.
     */
   def productViaFoldR(as: List[Int]): Int =
-    as.foldR(1)((a, acc) =>
-      if (a == 0) return 0 else a * acc
-    ) // seems that isn't possible
+    as.foldR(1)((a, acc) => if (a == 0) return 0 else a * acc) // seems that isn't possible
 
   /** Exercise 3.8
     *

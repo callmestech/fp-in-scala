@@ -224,6 +224,9 @@ object ParSync {
   ): ParSync[B] =
     join(map(pa)(a => choices(a)))
 
+  def equal[A](p1: ParSync[A], p2: ParSync[A]): ParSync[Boolean] =
+    map2(p1, p2)(_ == _)
+
   private case class UnitFuture[T](t: T) extends JFuture[T] {
     override def cancel(mayInterruptIfRunning: Boolean): Boolean = false
     override def isCancelled: Boolean                            = false

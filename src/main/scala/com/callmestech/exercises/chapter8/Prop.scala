@@ -2,13 +2,14 @@ package com.callmestech.exercises.chapter8
 
 import com.callmestech.exercises.chapter6.{RNG, SimpleRNG}
 import com.callmestech.exercises.chapter8.Prop.{FailedCase, MaxSize, SuccessCount, TestCases}
-import com.callmestech.exercises.chapter8.Result.{Falsified, Passed}
+import com.callmestech.exercises.chapter8.Result._
+import com.callmestech.exercises.chapter7.ParSync.ParSync
 
 case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
   def &&(p: Prop): Prop = Prop { (max, cases, rng) =>
     run(max, cases, rng) match {
-      case Passed => p.run(max, cases, rng)
-      case x      => x
+      case Passed | Proved => p.run(max, cases, rng)
+      case x               => x
     }
   }
 
@@ -38,8 +39,10 @@ object Prop {
     prop.run(maxSize, testCases, rng) match {
       case Falsified(failure, successes) =>
         println(s"! Falsified after $successes passed tests:\n $failure")
-      case Result.Passed =>
+      case Passed =>
         println(s"+ OK passed $testCases tests.")
+      case Proved =>
+        println(s"+ OK proved property.")
     }
 
   def forAll[A](gen: Int => Gen[A])(f: A => Boolean): Prop = Prop { (max, n, rng) =>
@@ -76,6 +79,19 @@ object Prop {
 
   def forAll[A](g: SGen[A])(f: A => Boolean): Prop =
     forAll(numberOfTestCases => g(numberOfTestCases))(f)
+
+  def forAllPar[A](g: Gen[A])(f: A => ParSync[Boolean]): Prop = {
+    forAll(Gen.ExecutorServiceGen ** g) { case (es, a) =>
+      f(a)(es).get()
+    }
+  }
+
+  def check(p: => Boolean): Prop = Prop { (_, _) =>
+    if (p) Proved else Falsified("()", 0)
+  }
+
+  def checkPar(p: ParSync[Boolean]): Prop =
+    forAllPar(Gen.unit(()))(_ => p)
 
   val maxProp: Prop = forAll(Gen.listOf(Gen.smallInt)) { ns =>
     val max = ns.max
@@ -131,5 +147,9 @@ object Result {
 
   final case class Falsified(failure: FailedCase, successes: SuccessCount) extends Result {
     override def isFalsified: Boolean = true
+  }
+
+  case object Proved extends Result {
+    override def isFalsified: Boolean = false
   }
 }

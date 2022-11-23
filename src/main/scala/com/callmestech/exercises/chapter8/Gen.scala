@@ -1,6 +1,8 @@
 package com.callmestech.exercises.chapter8
 
 import com.callmestech.exercises.chapter6.{RNG, State}
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 
 final case class Gen[+A](sample: State[RNG, A]) {
 
@@ -55,6 +57,11 @@ final case class SGen[+A](forSize: Int => Gen[A]) {
 }
 
 object Gen {
+
+  val ExecutorServiceGen: Gen[ExecutorService] = weighted(
+    choose(1, 4).map(Executors.newFixedThreadPool) -> 0.75,
+    unit(Executors.newWorkStealingPool) -> 0.25
+  )
 
   /** Exercise 8.4
     *
